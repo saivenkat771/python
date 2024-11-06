@@ -1,0 +1,107 @@
+#university management system
+class university:
+    num_universities=0
+    def __init__(self,name):
+        self.name=name
+        self.departments=[]
+        university.num_universities+=1
+    def add_departments(self,department):
+        self.departments.append(department)
+    @classmethod
+    def get_num_universities(cls):
+        return cls.num_universities
+
+class Department:
+    def __init__(self,name,university):
+        self.name=name
+        self.university=university
+        self.course=[]
+    def add_course(self,course):
+        self.course.append(course)
+    @staticmethod
+    def get_department_type():
+        return"Academic Department"
+
+class Course:
+    def __init__(self,course_id,name,credits):
+        self.couse_id=course_id
+        self.name=name
+        self.credits=credits
+        self.students=[]
+        self.schedule={}
+    def add_student(self,student):
+        self.students.append(student)
+    def set_schedule(self,schedule):
+        self.schedule=schedule
+class Student:
+    def __init__(self,student_id,name,major):
+        self.student_id=student_id
+        self.name=name
+        self.major=major
+        self.courses=[]
+    def enroll(self,course):
+        self.courses.append(course)
+        course.add_student(self) #add student to the course
+    def view_schedule(self):
+        print("Course Schedule:")
+        for course in self.courses:
+            print(f'{course.name}({course.couse_id}):{course.credits} credits')
+            for day,time in course.schedule.items():
+                print(f'{day}:{time}')
+        print()
+class UndergraduateStudent(Student):
+    def __init__(self,Student_id,name,major,gpa):
+        super().__init__(Student_id,name,major)
+        self.gpa=gpa
+class Faculty:
+    def __init__(self,faculty_id,name,department):
+        self.faculty_id=faculty_id
+        self.name=name
+        self.department=department
+        self.courses=[]
+    def assign_course(self,course):
+        self.courses.append(course)
+    def view_roster(self):
+        print("Student Roster:")
+        for course in self.courses:
+            print(f'{course.name}({course.couse_id}):')
+            for student in course.students:
+                print(f'{student.name}({student.student_id})')
+        print()
+    @classmethod
+    def get_faculty_type(cls):
+        return"Academic Faculty"
+
+#create objects
+university=university("Standford University")
+department=Department("Computer Science",university)
+
+course1=Course('CS101',"Introduction to Computer Science",3)
+course1.set_schedule({"Monday":"9.00 AM-10:30 Am","Wednesday":"2:00 PM-3:30PM"})
+course2=Course("CS202", "Data Structures", 4)
+course2.set_schedule({"Tuesday": "10:00 AM - 11:30 AM", "Thursday":"1:00 PM - 2:30 PM"})
+student1=UndergraduateStudent("B5","Raghava","Computer Science",5.0)
+student2=Student("406","Revanth","mathematics")
+
+faculty1=Faculty("107", "Dr.Samuel",department)
+
+#perform operations
+student1.enroll(course1)
+student2.enroll(course2)
+
+faculty1.assign_course(course1)
+faculty1.view_roster()
+university.add_departments(department)
+department.add_course(course1)
+print("Number of Universities",university.get_num_universities())
+print("Department type:",Department.get_department_type())
+print("Faculty type:",Faculty.get_faculty_type())
+
+student1.view_schedule()
+student2.view_schedule()
+
+        
+    
+            
+            
+        
