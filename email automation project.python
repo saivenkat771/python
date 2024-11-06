@@ -1,0 +1,26 @@
+#mime-multi internet mail extension protocol
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
+From="saivenkat2783@gmail.com"
+to="sv892783@gmail.com"
+subject="Hi"
+msg=MIMEMultipart()
+msg['From']=From
+msg['To']=to
+msg['subject']=subject
+
+body="Hello!"
+
+msg.attach(MIMEText(body,'plain'))
+text=msg.as_string()
+server=smtplib.SMTP('smtp.gmail.com',587)
+server.starttls()
+#next, login to the server
+server.login(From,"pyrm fjzh ilzl quir")#give your app passcode here
+#send  the mail
+server.sendmail(From,to,text)
+print("Mail Sent")
+server.quit()
+
