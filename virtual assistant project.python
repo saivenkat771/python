@@ -1,0 +1,167 @@
+#Building Virtual Assistant using Python
+'''
+import gtts
+#print(dir(gtts))
+from gtts import gTTS
+#Write the text what you want to convert to speech
+text = gTTS("Hello Everyone")
+#print(text)
+#save the above text in an audio file
+text.save("first.mp3")
+'''
+from gtts import gTTS
+import speech_recognition as sr
+import playsound
+from time import ctime
+import os
+import re
+import uuid #It's an identification number that will uniquely identify something. 
+#The idea being that id number will be universally unique
+import smtplib
+import webbrowser
+from tkinter import *
+from tkinter import ttk
+#to make sure it listens
+global data
+def listen():
+    r = sr.Recognizer()
+    with sr.Microphone() as source:
+        print("Start talking") #own statement
+        audio = r.listen(source,phrase_time_limit=5)
+    data = ""
+    #Exception Handling
+    try:
+        data = r.recognize_google(audio,language='en-US')
+        print("You said:"+data)
+    except sr.UnknownValueError:
+        print("I cannot hear you")
+    except sr.RequestError as e:
+        print("Request Failed")
+    return data
+#listen()
+
+#To respond back with audio 
+def respond(String):
+    print(String)
+    tts = gTTS(text = String,lang = 'en-US')
+    tts.save("speech.mp3")
+    filename = "Speech%s.mp3"%str(uuid.uuid4())
+    tts.save(filename)
+    playsound.playsound(filename)
+    os.remove(filename)
+
+#Giving actions to our Virtual Assistant
+#Virtual Assistant actions
+def virtual_assistant(data):
+    """give your actions"""
+    if "how are you" in data:
+        listening = True
+        entry1['text']="Good and doing well"
+        root.update()
+        respond("Good and doing well")
+
+    if "time" in data:
+        listening = True
+        entry1['text']=ctime()
+        root.update()
+        respond(ctime())
+    
+    if "open google" in data.casefold():
+        listening = True
+        reg_ex = re.search('open google(.*)',data)
+        url = "https://www.google.com/"
+        if reg_ex:
+            sub = reg_ex.group(1)
+            url = url + 'r/'
+        entry1['text']='Openning google'
+        root.update()
+        respond('Openning google')
+        webbrowser.open(url)
+
+    if "locate" in data:
+        webbrowser.open('https://www.google.com/maps/search/'+
+                        data.replace("locate",""))
+        result = "Located"
+        entry1['text']='Located'
+        root.update()
+        respond("Located {}".format(data.replace("locate","")))
+
+    if "email" in data:
+        listening = True
+        entry1['text']="Whom should i send email to?"
+        root.update()
+        respond("Whom should i send email to?")
+        to = listen()
+        edict = {'hello':'','new':''} #give mail ids
+        toaddr = edict[to]
+        entry1['text']="What is the Subject?"
+        root.update()
+        respond("What is the Subject?")
+        subject = listen()
+        entry1['text']="What should i tell that person?"
+        root.update()
+        respond("What should i tell that person?")
+        message = listen()
+        content = 'Subject :{}\n\n{}'.format(subject,message)
+
+        #init gmail SMTP
+        mail = smtplib.SMTP('smtp.gmail.com',587)
+        #identify the server
+        mail.ehlo()
+        mail.starttls()
+        #login
+        mail.login('','') #enter mailid and app password make sure you enable less secure app access
+        mail.sendmail('',toaddr,content) #enter your gmail username
+        mail.close()
+        entry1['text']='Email Sent'
+        root.update()
+        respond('Email Sent')
+
+    if "search google" in data.casefold():
+        listening = True
+        reg_ex = re.search('search google(.*)',data.casefold())
+        print(data)
+        url = "https://www.google.com/search?q="
+        if reg_ex:
+            sub = reg_ex.group(1)
+            print(sub,type(sub))
+        webbrowser.open(url + sub)
+        result = "Success"
+        entry1['text']="Search for {} complete".format(sub)
+        root.update()
+        respond("Search for {} complete".format(sub))
+
+    if "stop" in data:
+        listening =False
+        print("Listening Stopped")
+        entry1['text']="Okay done take care..."
+        root.update()
+        respond("Okay done take care...")
+        root.destroy()
+
+    try:
+        return listening
+    except UnboundLocalError:
+        print("Timedout")
+        
+def final():
+    data = listen()
+    entry1['text']=data
+    root.update()
+    virtual_assistant(data)
+root = Tk()
+root.title('Virtual Assistant')
+root.iconbitmap('mic.ico')
+style = ttk.Style()
+style.theme_use('winnative')
+photo = PhotoImage(file='microphone.png').subsample(17,17)
+entry1 = Label(root,text='Hey Codegnan How are you',bg='white',fg='black',height=2,width=75,font=('callibri',13,'bold'))
+entry1.pack(side=LEFT)
+MyButton6 = Button(root,image=photo, bd=0,command=final,activebackground='#c1bfbf', overrelief='groove', relief='sunken')
+MyButton6.pack(side=RIGHT)
+root.geometry('800x250')
+root.resizable(False,False)
+root.mainloop()
+
+
+   
