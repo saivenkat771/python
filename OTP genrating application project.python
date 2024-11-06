@@ -1,0 +1,23 @@
+import random
+import math
+import smtplib
+
+digits="0123456789"
+OTP="" #empty
+
+for i in range(6):
+    OTP+=digits[math.floor(random.random())]
+otp=OTP+"is your OTP"
+msg=otp
+
+s=smtplib.SMTP('smtp.gmail.com',587)
+s.starttls()
+s.login("saivenkat2783@gmail.com","pyrm fjzh ilzl quir")
+user="saivenkat2783@gmaail.com"
+emailid=input("Enter the mail which you want to send OTP:")
+s.sendmail(user,emailid,msg)
+a=input("Enter your OTP>>:")
+if a==OTP:
+    print("OTP crrct")
+else:
+    print("OTP wrong")
